@@ -1,0 +1,4 @@
+# Сгенерировано infrastructure/render.py из experiments/configs/bench.yaml.
+# Не редактировать вручную: python -m infrastructure.render
+include:
+- infrastructure/generated/compose/monolith.yml

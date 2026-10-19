@@ -1,0 +1,5 @@
+architecture,x_max,r_star,vus
+monolith,255.868,5000,
+three_tier,255.2976666666667,5000,
+microservices,114.12866666666669,2000,
+serverless,639.3166666666667,5000,

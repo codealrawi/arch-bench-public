@@ -1,0 +1,701 @@
+# Сгенерировано infrastructure/render.py из experiments/configs/bench.yaml.
+# Не редактировать вручную: python -m infrastructure.render
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway
+  namespace: arch-bench
+  labels:
+    app: gateway
+    arch-bench/role: request-path
+    arch-bench/arch: microservices
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gateway
+  template:
+    metadata:
+      labels:
+        app: gateway
+        arch-bench/role: request-path
+        arch-bench/arch: microservices
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '8000'
+        prometheus.io/path: /metrics
+    spec:
+      terminationGracePeriodSeconds: 35
+      containers:
+      - name: gateway
+        image: docker.io/mustafaalrawi8/arch-bench-app:2.1.0
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: ACCESS_TOKEN_TTL_S
+          value: '3600'
+        - name: ANALYTICS_URL
+          value: http://analytics.arch-bench.svc.cluster.local:8000
+        - name: APP_FACTORY
+          value: apps.gateway.app:create_app
+        - name: APP_PORT
+          value: '8000'
+        - name: APP_WORKERS
+          value: '1'
+        - name: AUTH_MODE
+          value: jwt
+        - name: AUTH_URL
+          value: http://auth.arch-bench.svc.cluster.local:8000
+        - name: COMMENTS_PAGE_LIMIT
+          value: '50'
+        - name: CONTENT_URL
+          value: http://content.arch-bench.svc.cluster.local:8000
+        - name: FEED_LIMIT
+          value: '20'
+        - name: GRACEFUL_SHUTDOWN_S
+          value: '25'
+        - name: LOG_LEVEL
+          value: INFO
+        - name: LOG_REQUESTS
+          value: 'false'
+        - name: PBKDF2_ITERATIONS
+          value: '1000'
+        - name: PYTHONUNBUFFERED
+          value: '1'
+        - name: RATE_LIMIT_AUTH_PER_MINUTE
+          value: '5000'
+        - name: REFRESH_TOKEN_TTL_S
+          value: '604800'
+        - name: REQUEST_TIMEOUT_S
+          value: '30.0'
+        - name: SEARCH_LIMIT
+          value: '20'
+        - name: SERVICE_NAME
+          value: microservices-gateway
+        - name: STATS_WINDOW_DAYS
+          value: '7'
+        - name: UPSTREAM_TIMEOUT_S
+          value: '30.0'
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: arch-bench-secrets
+              key: JWT_SECRET
+        ports:
+        - containerPort: 8000
+          name: http
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1024Mi
+          limits:
+            cpu: 500m
+            memory: 1024Mi
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: 8000
+          periodSeconds: 2
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          periodSeconds: 10
+          failureThreshold: 6
+          initialDelaySeconds: 10
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - sleep
+              - '5'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway
+  namespace: arch-bench
+spec:
+  selector:
+    app: gateway
+  ports:
+  - port: 8000
+    targetPort: 8000
+    name: http
+    nodePort: 30080
+  type: NodePort
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: gateway
+  namespace: arch-bench
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: gateway
+  minReplicas: 1
+  maxReplicas: 2
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 0
+    scaleDown:
+      stabilizationWindowSeconds: 300
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth
+  namespace: arch-bench
+  labels:
+    app: auth
+    arch-bench/role: request-path
+    arch-bench/arch: microservices
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+        arch-bench/role: request-path
+        arch-bench/arch: microservices
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '8000'
+        prometheus.io/path: /metrics
+    spec:
+      terminationGracePeriodSeconds: 35
+      containers:
+      - name: auth
+        image: docker.io/mustafaalrawi8/arch-bench-app:2.1.0
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: ACCESS_TOKEN_TTL_S
+          value: '3600'
+        - name: APP_FACTORY
+          value: apps.services.app:create_auth
+        - name: APP_PORT
+          value: '8000'
+        - name: APP_WORKERS
+          value: '1'
+        - name: AUTH_MODE
+          value: trusted-headers
+        - name: COMMENTS_PAGE_LIMIT
+          value: '50'
+        - name: DB_COMMAND_TIMEOUT_S
+          value: '30.0'
+        - name: DB_POOL_SIZE
+          value: '10'
+        - name: FEED_LIMIT
+          value: '20'
+        - name: GRACEFUL_SHUTDOWN_S
+          value: '25'
+        - name: LOG_LEVEL
+          value: INFO
+        - name: LOG_REQUESTS
+          value: 'false'
+        - name: PBKDF2_ITERATIONS
+          value: '1000'
+        - name: PYTHONUNBUFFERED
+          value: '1'
+        - name: RATE_LIMIT_AUTH_PER_MINUTE
+          value: '5000'
+        - name: REFRESH_TOKEN_TTL_S
+          value: '604800'
+        - name: REQUEST_TIMEOUT_S
+          value: '30.0'
+        - name: SEARCH_LIMIT
+          value: '20'
+        - name: SERVICE_NAME
+          value: microservices-auth
+        - name: STATS_WINDOW_DAYS
+          value: '7'
+        - name: TRUST_PROXY
+          value: 'true'
+        - name: UPSTREAM_TIMEOUT_S
+          value: '30.0'
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: arch-bench-secrets
+              key: JWT_SECRET
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: arch-bench-secrets
+              key: DATABASE_URL
+        ports:
+        - containerPort: 8000
+          name: http
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1024Mi
+          limits:
+            cpu: 500m
+            memory: 1024Mi
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: 8000
+          periodSeconds: 2
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          periodSeconds: 10
+          failureThreshold: 6
+          initialDelaySeconds: 10
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - sleep
+              - '5'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth
+  namespace: arch-bench
+spec:
+  selector:
+    app: auth
+  ports:
+  - port: 8000
+    targetPort: 8000
+    name: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: content
+  namespace: arch-bench
+  labels:
+    app: content
+    arch-bench/role: request-path
+    arch-bench/arch: microservices
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: content
+  template:
+    metadata:
+      labels:
+        app: content
+        arch-bench/role: request-path
+        arch-bench/arch: microservices
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '8000'
+        prometheus.io/path: /metrics
+    spec:
+      terminationGracePeriodSeconds: 35
+      containers:
+      - name: content
+        image: docker.io/mustafaalrawi8/arch-bench-app:2.1.0
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: ACCESS_TOKEN_TTL_S
+          value: '3600'
+        - name: APP_FACTORY
+          value: apps.services.app:create_content
+        - name: APP_PORT
+          value: '8000'
+        - name: APP_WORKERS
+          value: '1'
+        - name: AUTH_MODE
+          value: trusted-headers
+        - name: COMMENTS_PAGE_LIMIT
+          value: '50'
+        - name: DB_COMMAND_TIMEOUT_S
+          value: '30.0'
+        - name: DB_POOL_SIZE
+          value: '25'
+        - name: FEED_LIMIT
+          value: '20'
+        - name: GRACEFUL_SHUTDOWN_S
+          value: '25'
+        - name: LOG_LEVEL
+          value: INFO
+        - name: LOG_REQUESTS
+          value: 'false'
+        - name: MODERATION_URL
+          value: http://moderation.arch-bench.svc.cluster.local:8000
+        - name: PBKDF2_ITERATIONS
+          value: '1000'
+        - name: PYTHONUNBUFFERED
+          value: '1'
+        - name: RATE_LIMIT_AUTH_PER_MINUTE
+          value: '5000'
+        - name: REFRESH_TOKEN_TTL_S
+          value: '604800'
+        - name: REQUEST_TIMEOUT_S
+          value: '30.0'
+        - name: SEARCH_LIMIT
+          value: '20'
+        - name: SERVICE_NAME
+          value: microservices-content
+        - name: STATS_WINDOW_DAYS
+          value: '7'
+        - name: TRUST_PROXY
+          value: 'true'
+        - name: UPSTREAM_TIMEOUT_S
+          value: '30.0'
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: arch-bench-secrets
+              key: JWT_SECRET
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: arch-bench-secrets
+              key: DATABASE_URL
+        ports:
+        - containerPort: 8000
+          name: http
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1024Mi
+          limits:
+            cpu: 500m
+            memory: 1024Mi
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: 8000
+          periodSeconds: 2
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          periodSeconds: 10
+          failureThreshold: 6
+          initialDelaySeconds: 10
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - sleep
+              - '5'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: content
+  namespace: arch-bench
+spec:
+  selector:
+    app: content
+  ports:
+  - port: 8000
+    targetPort: 8000
+    name: http
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: content
+  namespace: arch-bench
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: content
+  minReplicas: 1
+  maxReplicas: 2
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 0
+    scaleDown:
+      stabilizationWindowSeconds: 300
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: moderation
+  namespace: arch-bench
+  labels:
+    app: moderation
+    arch-bench/role: request-path
+    arch-bench/arch: microservices
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: moderation
+  template:
+    metadata:
+      labels:
+        app: moderation
+        arch-bench/role: request-path
+        arch-bench/arch: microservices
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '8000'
+        prometheus.io/path: /metrics
+    spec:
+      terminationGracePeriodSeconds: 35
+      containers:
+      - name: moderation
+        image: docker.io/mustafaalrawi8/arch-bench-app:2.1.0
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: ACCESS_TOKEN_TTL_S
+          value: '3600'
+        - name: APP_FACTORY
+          value: apps.services.app:create_moderation
+        - name: APP_PORT
+          value: '8000'
+        - name: APP_WORKERS
+          value: '1'
+        - name: AUTH_MODE
+          value: trusted-headers
+        - name: COMMENTS_PAGE_LIMIT
+          value: '50'
+        - name: FEED_LIMIT
+          value: '20'
+        - name: GRACEFUL_SHUTDOWN_S
+          value: '25'
+        - name: LOG_LEVEL
+          value: INFO
+        - name: LOG_REQUESTS
+          value: 'false'
+        - name: PBKDF2_ITERATIONS
+          value: '1000'
+        - name: PYTHONUNBUFFERED
+          value: '1'
+        - name: RATE_LIMIT_AUTH_PER_MINUTE
+          value: '5000'
+        - name: REFRESH_TOKEN_TTL_S
+          value: '604800'
+        - name: REQUEST_TIMEOUT_S
+          value: '30.0'
+        - name: SEARCH_LIMIT
+          value: '20'
+        - name: SERVICE_NAME
+          value: microservices-moderation
+        - name: STATS_WINDOW_DAYS
+          value: '7'
+        - name: TRUST_PROXY
+          value: 'true'
+        - name: UPSTREAM_TIMEOUT_S
+          value: '30.0'
+        ports:
+        - containerPort: 8000
+          name: http
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1024Mi
+          limits:
+            cpu: 500m
+            memory: 1024Mi
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: 8000
+          periodSeconds: 2
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          periodSeconds: 10
+          failureThreshold: 6
+          initialDelaySeconds: 10
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - sleep
+              - '5'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: moderation
+  namespace: arch-bench
+spec:
+  selector:
+    app: moderation
+  ports:
+  - port: 8000
+    targetPort: 8000
+    name: http
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: moderation
+  namespace: arch-bench
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: moderation
+  minReplicas: 1
+  maxReplicas: 2
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 0
+    scaleDown:
+      stabilizationWindowSeconds: 300
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: analytics
+  namespace: arch-bench
+  labels:
+    app: analytics
+    arch-bench/role: request-path
+    arch-bench/arch: microservices
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: analytics
+  template:
+    metadata:
+      labels:
+        app: analytics
+        arch-bench/role: request-path
+        arch-bench/arch: microservices
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '8000'
+        prometheus.io/path: /metrics
+    spec:
+      terminationGracePeriodSeconds: 35
+      containers:
+      - name: analytics
+        image: docker.io/mustafaalrawi8/arch-bench-app:2.1.0
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: ACCESS_TOKEN_TTL_S
+          value: '3600'
+        - name: APP_FACTORY
+          value: apps.services.app:create_analytics
+        - name: APP_PORT
+          value: '8000'
+        - name: APP_WORKERS
+          value: '1'
+        - name: AUTH_MODE
+          value: trusted-headers
+        - name: COMMENTS_PAGE_LIMIT
+          value: '50'
+        - name: DB_COMMAND_TIMEOUT_S
+          value: '30.0'
+        - name: DB_POOL_SIZE
+          value: '20'
+        - name: FEED_LIMIT
+          value: '20'
+        - name: GRACEFUL_SHUTDOWN_S
+          value: '25'
+        - name: LOG_LEVEL
+          value: INFO
+        - name: LOG_REQUESTS
+          value: 'false'
+        - name: PBKDF2_ITERATIONS
+          value: '1000'
+        - name: PYTHONUNBUFFERED
+          value: '1'
+        - name: RATE_LIMIT_AUTH_PER_MINUTE
+          value: '5000'
+        - name: REFRESH_TOKEN_TTL_S
+          value: '604800'
+        - name: REQUEST_TIMEOUT_S
+          value: '30.0'
+        - name: SEARCH_LIMIT
+          value: '20'
+        - name: SERVICE_NAME
+          value: microservices-analytics
+        - name: STATS_WINDOW_DAYS
+          value: '7'
+        - name: TRUST_PROXY
+          value: 'true'
+        - name: UPSTREAM_TIMEOUT_S
+          value: '30.0'
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: arch-bench-secrets
+              key: JWT_SECRET
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: arch-bench-secrets
+              key: DATABASE_URL
+        ports:
+        - containerPort: 8000
+          name: http
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1024Mi
+          limits:
+            cpu: 500m
+            memory: 1024Mi
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: 8000
+          periodSeconds: 2
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          periodSeconds: 10
+          failureThreshold: 6
+          initialDelaySeconds: 10
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - sleep
+              - '5'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: analytics
+  namespace: arch-bench
+spec:
+  selector:
+    app: analytics
+  ports:
+  - port: 8000
+    targetPort: 8000
+    name: http

@@ -1,0 +1,17 @@
+# Сгенерировано infrastructure/render.py из experiments/configs/bench.yaml.
+# Не редактировать вручную: python -m infrastructure.render
+services:
+  app:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/app.Dockerfile
+    environment:
+      LOG_REQUESTS: 'true'
+      LOG_LEVEL: DEBUG
+    volumes:
+    - ./apps:/app/apps:ro
+    - ./database:/app/database:ro
+  migrate:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/app.Dockerfile

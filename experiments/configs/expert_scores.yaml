@@ -1,0 +1,24 @@
+# Экспертные данные для Табл. 3 (docs/evaluation-methodology.md). Заполняет АВТОР.
+# Пока поля = null, Score(A_k) не вычисляется и в научных результатах не используется.
+#
+# weights_source:
+#   article_unverified — веса взяты из статьи, процедура их получения не подтверждена;
+#   author_confirmed   — веса получены по процедуре methodology §5 (МАИ, CR ≤ 0,10).
+weights_source: article_unverified
+weights:            # INPUT: из статьи, не подтверждены — анализ не использует их для Score
+  scalability: null
+  fault_tolerance: null
+  performance: null
+  complexity: null
+  cost: null
+  security: null
+# Справочно (ДАННЫЕ СТАТЬИ, не используются кодом): 0.25 / 0.20 / 0.20 / 0.15 / 0.10 / 0.10
+
+experts: []         # INPUT: обезличенные ID, квалификация (methodology §2)
+
+expert_scores:      # INPUT: медиана баллов 1…9 по экспертам; исходные баллы — в raw_scores
+  complexity: {monolith: null, three_tier: null, microservices: null, serverless: null}
+  security:   {monolith: null, three_tier: null, microservices: null, serverless: null}
+
+raw_scores: {}      # INPUT: {expert_id: {criterion: {architecture: score}}}
+ahp_matrices: {}    # INPUT: {expert_id: 6×6 матрица попарных сравнений}

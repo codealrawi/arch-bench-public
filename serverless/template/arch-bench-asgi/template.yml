@@ -1,0 +1,4 @@
+language: arch-bench-asgi
+# Тот же образ, что у всех архитектур: функция = ASGI-приложение
+# serverless.functions.handlers:create_<name> (APP_FACTORY в stack.yml).
+fprocess: /usr/local/bin/entrypoint.sh

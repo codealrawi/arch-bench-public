@@ -1,0 +1,4 @@
+2440 raw/MANIFEST.sha256
+eea77b5a30d23f038fa03ea0a50a22e3ee1f974bcf59dfe818b245922cb52f14  monolith/run_01/meta.json
+3c14de6c5e80b293ee35ed4813a949195fe78c9b8e77b564aadd7d11b5f9f9ed  monolith/run_01/step_0010/generator_cpu.csv
+5860f81b2c1344f7bc9bbc84227cc6c88c3f3e7e33cc1887edad3cdc63c34448  monolith/run_01/step_0010/k6.log

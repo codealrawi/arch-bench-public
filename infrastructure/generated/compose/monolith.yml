@@ -1,0 +1,96 @@
+# Сгенерировано infrastructure/render.py из experiments/configs/bench.yaml.
+# Не редактировать вручную: python -m infrastructure.render
+name: arch-bench-monolith
+services:
+  postgres:
+    image: postgres:16
+    command:
+    - postgres
+    - -c
+    - config_file=/etc/postgresql/postgresql.conf
+    environment:
+      POSTGRES_DB: bench
+      POSTGRES_USER: bench
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required (.env)}
+    volumes:
+    - ../postgres/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+    - pgdata:/var/lib/postgresql/data
+    cpus: '2.0'
+    mem_limit: 4096m
+    mem_reservation: 4096m
+    shm_size: 1g
+    ulimits:
+      nofile:
+        soft: 524288
+        hard: 524288
+    ports:
+    - 127.0.0.1:5432:5432
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - pg_isready -U bench -d bench
+      interval: 2s
+      timeout: 2s
+      retries: 60
+    restart: unless-stopped
+  migrate:
+    image: docker.io/mustafaalrawi8/arch-bench-app:2.1.0
+    command:
+    - python
+    - -m
+    - database.manage
+    - migrate
+    - up
+    environment:
+      DATABASE_URL: postgresql://bench:${POSTGRES_PASSWORD}@postgres:5432/bench
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: 'no'
+  app:
+    image: docker.io/mustafaalrawi8/arch-bench-app:2.1.0
+    environment:
+      ACCESS_TOKEN_TTL_S: '3600'
+      REFRESH_TOKEN_TTL_S: '604800'
+      PBKDF2_ITERATIONS: '1000'
+      REQUEST_TIMEOUT_S: '30.0'
+      RATE_LIMIT_AUTH_PER_MINUTE: '5000'
+      FEED_LIMIT: '20'
+      COMMENTS_PAGE_LIMIT: '50'
+      SEARCH_LIMIT: '20'
+      STATS_WINDOW_DAYS: '7'
+      UPSTREAM_TIMEOUT_S: '30.0'
+      LOG_LEVEL: INFO
+      LOG_REQUESTS: 'false'
+      PYTHONUNBUFFERED: '1'
+      SERVICE_NAME: monolith-app
+      AUTH_MODE: jwt
+      APP_FACTORY: apps.monolith.app:create_app
+      APP_PORT: '8000'
+      APP_WORKERS: '4'
+      GRACEFUL_SHUTDOWN_S: '25'
+      PROMETHEUS_MULTIPROC_DIR: /tmp/prometheus-multiproc
+      DB_POOL_SIZE: '20'
+      DB_COMMAND_TIMEOUT_S: '30.0'
+      SERVE_FRONTEND: 'true'
+      HEALTH_PATH: /health
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required (.env)}
+      DATABASE_URL: postgresql://bench:${POSTGRES_PASSWORD}@postgres:5432/bench
+    cpus: '4.0'
+    mem_limit: 8192m
+    mem_reservation: 8192m
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    stop_grace_period: 30s
+    ulimits:
+      nofile:
+        soft: 524288
+        hard: 524288
+    restart: unless-stopped
+    labels:
+      arch-bench.role: request-path
+    ports:
+    - 8000:8000
+volumes:
+  pgdata: {}

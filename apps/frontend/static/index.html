@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>МедСоцПлатформа</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a href="#/feed" class="brand">МедСоцПлатформа</a>
+    <nav id="nav" hidden>
+      <a href="#/feed">Лента</a>
+      <a href="#/new">Новая публикация</a>
+      <a href="#/stats">Статистика</a>
+      <a href="#/me">Профиль</a>
+      <button id="logout" type="button" class="link">Выйти</button>
+    </nav>
+  </header>
+
+  <main id="app" aria-live="polite"></main>
+  <div id="toast" role="status" hidden></div>
+
+  <template id="tpl-auth">
+    <section class="card narrow">
+      <h1>Вход</h1>
+      <form id="login-form">
+        <label>Email <input name="email" type="email" required autocomplete="username"></label>
+        <label>Пароль <input name="password" type="password" required autocomplete="current-password"></label>
+        <button type="submit">Войти</button>
+      </form>
+      <h2>Регистрация</h2>
+      <form id="register-form">
+        <label>Имя <input name="display_name" required maxlength="100"></label>
+        <label>Email <input name="email" type="email" required autocomplete="username"></label>
+        <label>Пароль (не короче 8 символов)
+          <input name="password" type="password" required minlength="8" autocomplete="new-password"></label>
+        <label>Роль
+          <select name="role"><option value="patient">Пациент</option><option value="doctor">Врач</option></select>
+        </label>
+        <button type="submit">Зарегистрироваться</button>
+      </form>
+    </section>
+  </template>
+
+  <template id="tpl-feed">
+    <section>
+      <form id="search-form" class="row">
+        <input name="q" placeholder="Поиск по публикациям" maxlength="200" required>
+        <button type="submit">Найти</button>
+      </form>
+      <div class="row">
+        <label>Категория <select id="category-filter"><option value="">Все</option></select></label>
+      </div>
+      <h1 id="feed-title">Лента</h1>
+      <ul id="posts" class="posts"></ul>
+      <button id="more" type="button" hidden>Ещё</button>
+    </section>
+  </template>
+
+  <template id="tpl-post-item">
+    <li class="card post">
+      <a class="title"></a>
+      <div class="meta"></div>
+      <p class="excerpt"></p>
+    </li>
+  </template>
+
+  <template id="tpl-post">
+    <article class="card">
+      <h1 class="title"></h1>
+      <div class="meta"></div>
+      <p class="body"></p>
+      <div class="reactions">
+        <button type="button" data-kind="like">👍 Нравится</button>
+        <button type="button" data-kind="support">🤝 Поддержка</button>
+        <button type="button" data-kind="useful">💡 Полезно</button>
+        <button type="button" data-kind="" class="link">Убрать реакцию</button>
+        <span class="count"></span>
+      </div>
+      <h2>Комментарии</h2>
+      <ul class="comments"></ul>
+      <form id="comment-form">
+        <textarea name="body" required maxlength="5000" placeholder="Ваш комментарий"></textarea>
+        <button type="submit">Отправить</button>
+      </form>
+    </article>
+  </template>
+
+  <template id="tpl-new">
+    <section class="card">
+      <h1>Новая публикация</h1>
+      <form id="post-form">
+        <label>Заголовок <input name="title" required maxlength="300"></label>
+        <label>Категория <select name="category_id" required></select></label>
+        <label>Текст <textarea name="body" required maxlength="20000" rows="8"></textarea></label>
+        <button type="submit">Опубликовать</button>
+      </form>
+      <p class="hint">Публикация проходит автоматическую модерацию.</p>
+    </section>
+  </template>
+
+  <template id="tpl-me">
+    <section class="card narrow">
+      <h1>Профиль</h1>
+      <dl class="profile"></dl>
+      <h2>Изменить</h2>
+      <form id="profile-form">
+        <label>Имя <input name="display_name" maxlength="100"></label>
+        <label>Город <input name="city" maxlength="100"></label>
+        <label>Год рождения <input name="birth_year" type="number" min="1900" max="2100"></label>
+        <label>О себе <textarea name="bio" maxlength="2000"></textarea></label>
+        <button type="submit">Сохранить</button>
+      </form>
+    </section>
+  </template>
+
+  <template id="tpl-stats">
+    <section class="card">
+      <h1>Статистика за <span class="window"></span> дней</h1>
+      <dl class="totals"></dl>
+      <h2>Популярные категории</h2>
+      <ol class="top"></ol>
+      <h2>Публикации по дням</h2>
+      <table class="by-day"><thead><tr><th>День</th><th>Статус</th><th>Число</th></tr></thead><tbody></tbody></table>
+    </section>
+  </template>
+</body>
+</html>

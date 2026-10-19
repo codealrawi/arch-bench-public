@@ -1,0 +1,312 @@
+{
+  "generated_at_utc": "2026-10-08T21:03:53.103488+00:00",
+  "protocol_version": "2.1",
+  "config_sha256": "963109ae713552e6c366ac67a2c19bdf82028a4a669ad8c171128a43b4fb32d0",
+  "sla_ms": 500.0,
+  "sla_metric": "p95",
+  "sla_source": "AUTHOR-defined experimental threshold (2026-10-04)",
+  "environments": [
+    "server"
+  ],
+  "scientific": true,
+  "aggregates_sha256": "7682b591cad3a0f35f8db28b01d505b131ad5514113b2dffa5f241c2d1a786be",
+  "n_run_level_rows": 320,
+  "runs": [
+    {
+      "architecture": "monolith",
+      "run": "run_01",
+      "environment": "server"
+    },
+    {
+      "architecture": "monolith",
+      "run": "run_02",
+      "environment": "server"
+    },
+    {
+      "architecture": "monolith",
+      "run": "run_03",
+      "environment": "server"
+    },
+    {
+      "architecture": "monolith",
+      "run": "run_04",
+      "environment": "server"
+    },
+    {
+      "architecture": "monolith",
+      "run": "run_05",
+      "environment": "server"
+    },
+    {
+      "architecture": "monolith",
+      "run": "run_06",
+      "environment": "server"
+    },
+    {
+      "architecture": "monolith",
+      "run": "run_07",
+      "environment": "server"
+    },
+    {
+      "architecture": "monolith",
+      "run": "run_08",
+      "environment": "server"
+    },
+    {
+      "architecture": "monolith",
+      "run": "run_09",
+      "environment": "server"
+    },
+    {
+      "architecture": "monolith",
+      "run": "run_10",
+      "environment": "server"
+    },
+    {
+      "architecture": "three_tier",
+      "run": "run_01",
+      "environment": "server"
+    },
+    {
+      "architecture": "three_tier",
+      "run": "run_02",
+      "environment": "server"
+    },
+    {
+      "architecture": "three_tier",
+      "run": "run_03",
+      "environment": "server"
+    },
+    {
+      "architecture": "three_tier",
+      "run": "run_04",
+      "environment": "server"
+    },
+    {
+      "architecture": "three_tier",
+      "run": "run_05",
+      "environment": "server"
+    },
+    {
+      "architecture": "three_tier",
+      "run": "run_06",
+      "environment": "server"
+    },
+    {
+      "architecture": "three_tier",
+      "run": "run_07",
+      "environment": "server"
+    },
+    {
+      "architecture": "three_tier",
+      "run": "run_08",
+      "environment": "server"
+    },
+    {
+      "architecture": "three_tier",
+      "run": "run_09",
+      "environment": "server"
+    },
+    {
+      "architecture": "three_tier",
+      "run": "run_10",
+      "environment": "server"
+    },
+    {
+      "architecture": "microservices",
+      "run": "run_01",
+      "environment": "server"
+    },
+    {
+      "architecture": "microservices",
+      "run": "run_02",
+      "environment": "server"
+    },
+    {
+      "architecture": "microservices",
+      "run": "run_03",
+      "environment": "server"
+    },
+    {
+      "architecture": "microservices",
+      "run": "run_04",
+      "environment": "server"
+    },
+    {
+      "architecture": "microservices",
+      "run": "run_05",
+      "environment": "server"
+    },
+    {
+      "architecture": "microservices",
+      "run": "run_06",
+      "environment": "server"
+    },
+    {
+      "architecture": "microservices",
+      "run": "run_07",
+      "environment": "server"
+    },
+    {
+      "architecture": "microservices",
+      "run": "run_08",
+      "environment": "server"
+    },
+    {
+      "architecture": "microservices",
+      "run": "run_09",
+      "environment": "server"
+    },
+    {
+      "architecture": "microservices",
+      "run": "run_10",
+      "environment": "server"
+    },
+    {
+      "architecture": "serverless",
+      "run": "run_01",
+      "environment": "server"
+    },
+    {
+      "architecture": "serverless",
+      "run": "run_02",
+      "environment": "server"
+    },
+    {
+      "architecture": "serverless",
+      "run": "run_03",
+      "environment": "server"
+    },
+    {
+      "architecture": "serverless",
+      "run": "run_04",
+      "environment": "server"
+    },
+    {
+      "architecture": "serverless",
+      "run": "run_05",
+      "environment": "server"
+    },
+    {
+      "architecture": "serverless",
+      "run": "run_06",
+      "environment": "server"
+    },
+    {
+      "architecture": "serverless",
+      "run": "run_07",
+      "environment": "server"
+    },
+    {
+      "architecture": "serverless",
+      "run": "run_08",
+      "environment": "server"
+    },
+    {
+      "architecture": "serverless",
+      "run": "run_09",
+      "environment": "server"
+    },
+    {
+      "architecture": "serverless",
+      "run": "run_10",
+      "environment": "server"
+    }
+  ],
+  "invalid_runs": [
+    {
+      "architecture": "three_tier",
+      "run_dir": "run_06_20261007T151326Z",
+      "reason": "# Невалидный прогон (протокол §12.2)\n\n- k6 завершился с кодом 1 (аварийно)\n- нет момента старта сценария в сырых данных\n- teardown: Command '['docker', 'compose', '-f', '/root/arch-bench/infrastructure/generated/compose/three-tier.yml', '--env-file', '/root/arch-bench/.env', 'down', '-v', '--remove-orphans']' timed out after 300 seconds\n\nСырые данные сохранены; прогон повторяется с тем же номером."
+    },
+    {
+      "architecture": "three_tier",
+      "run_dir": "run_06_20261007T152042Z",
+      "reason": "# Невалидный прогон (протокол §12.2)\n\n- сбой стенда: TimeoutExpired: Command '['docker', 'compose', '-f', '/root/arch-bench/infrastructure/generated/compose/three-tier.yml', '--env-file', '/root/arch-bench/.env', 'down', '-v', '--remove-orphans']' timed out after 300 seconds\n\nСырые данные сохранены; прогон повторяется с тем же номером."
+    },
+    {
+      "architecture": "serverless",
+      "run_dir": "run_05_20261007T113706Z",
+      "reason": "# Невалидный прогон (протокол §12.2)\n\n- пропуск мониторинга pg_connections.csv: 53 с > 30 с\n\nСырые данные сохранены; прогон повторяется с тем же номером."
+    },
+    {
+      "architecture": "serverless",
+      "run_dir": "run_05_20261007T125153Z",
+      "reason": "# Невалидный прогон (протокол §12.2)\n\n- пропуск мониторинга pods.csv: 65 с > 30 с\n- teardown: Command '['kubectl', 'delete', 'namespace', 'arch-bench', '--wait=true', '--ignore-not-found']' timed out after 900 seconds\n\nСырые данные сохранены; прогон повторяется с тем же номером."
+    }
+  ],
+  "excluded_runs": [],
+  "python": "3.12.3",
+  "littles_warnings": 2,
+  "table3_notes": [
+    "Score не вычислен: экспертные данные не получены (weights; weights_source=article_unverified (нужно author_confirmed); expert_scores.complexity; expert_scores.security)."
+  ],
+  "figures": [
+    "fig1_rt_monolith_three_tier.png",
+    "fig2_rt_microservices_serverless.png",
+    "rt_p95_all.png",
+    "throughput_all.png",
+    "errors_all.png"
+  ],
+  "post_series": {
+    "plan": "docs/post-series-analysis-plan.md",
+    "thresholds": {
+      "u_db_saturation": 0.85,
+      "x_growth_max": 0.1,
+      "vu_ratio_min": 2.0,
+      "cliff": [
+        0.147,
+        0.33,
+        0.474
+      ],
+      "alpha": 0.05,
+      "littles_tolerance": 0.1
+    },
+    "common_bottleneck": {
+      "architectures_analysed": [
+        "microservices",
+        "monolith",
+        "serverless",
+        "three_tier"
+      ],
+      "db_saturated": [
+        "microservices",
+        "monolith",
+        "three_tier"
+      ],
+      "postgres_common_bottleneck": false,
+      "note": ""
+    },
+    "pre_saturation_steps": [
+      10,
+      50,
+      100,
+      200
+    ],
+    "data_gaps": [
+      "pg_stat_statements по ступеням не сохраняется: МЕХАНИЗМ различий D_db (какие запросы, сколько их на HTTP-запрос) по сырым данным не раскрывается — только величина D_db.",
+      "Троттлинг CPU cgroup (container_cpu_cfs_throttled_*) не экспортируется: U_db ≈ 1 показывает упор в лимит по потреблению, но время ожидания из-за троттлинга не измерено.",
+      "D_i оценивается по CPU-секундам: ожидания ввода-вывода, блокировок и сети в D_i не входят, поэтому X_max = c/D_i — оптимистичная (верхняя) оценка, а не измерение.",
+      "D (суммарный спрос) оценивается средним временем ответа на минимальной ступени: включает сетевой RTT (~0,6 мс) и возможное ожидание в очередях — это оценка, а не измерение."
+    ],
+    "figures": [
+      "ps_chain_monolith.png",
+      "ps_chain_three_tier.png",
+      "ps_chain_microservices.png",
+      "ps_chain_serverless.png",
+      "ps_closed_model_bounds.png",
+      "ps_cpu_by_group.png"
+    ],
+    "tables": [
+      "ps_chain",
+      "ps_closed_model_bounds",
+      "ps_closed_model_params",
+      "ps_cpu_utilization",
+      "ps_db_load",
+      "ps_littles_law_empirical",
+      "ps_pairwise_all_steps",
+      "ps_pairwise_pre_saturation",
+      "ps_saturation_points"
+    ]
+  }
+}

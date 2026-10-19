@@ -1,0 +1,66 @@
+{
+  "vus": 1000,
+  "step_index": 5,
+  "k6_seed": 20262009,
+  "db_state_before": {
+    "reset_s": 86.81,
+    "counts": {
+      "audit_logs": 0,
+      "refresh_tokens": 0,
+      "moderation_records": 200000,
+      "reactions": 1500000,
+      "comments": 600000,
+      "posts": 200000,
+      "profiles": 10000,
+      "users": 10000,
+      "medical_categories": 20
+    },
+    "posts_by_status": {
+      "approved": 189891,
+      "blocked": 1199,
+      "suspicious": 8910
+    },
+    "posts_in_stats_window": 46453,
+    "snapshot_md5": {
+      "categories": "f525d3ef340f2622ea3c15ec8092860e",
+      "comments": "def7b252014b6f16f0a5adc77cb93743",
+      "moderation_records": "41c07fb0b2e31a64d23b270be13ebb3d",
+      "posts": "aa0e431697a2fad6770657001c18eafc",
+      "profiles": "53661417280c6a1c414d92f2d5ed691b",
+      "reactions": "40b6149c849af34e1c08b50c77180dfe",
+      "users": "28cb50c5580de7a7b1185641dab2f956"
+    }
+  },
+  "k6_started_at": 1791296688.300192,
+  "k6_finished_at": 1791297171.0493999,
+  "k6_exit_code": 0,
+  "sampler_errors": [],
+  "db_state_after": {
+    "counts": {
+      "audit_logs": 2812,
+      "refresh_tokens": 1000,
+      "moderation_records": 211058,
+      "reactions": 1505426,
+      "comments": 609274,
+      "posts": 211058,
+      "profiles": 10000,
+      "users": 10000,
+      "medical_categories": 20
+    },
+    "posts_by_status": {
+      "approved": 200423,
+      "blocked": 1236,
+      "suspicious": 9399
+    },
+    "posts_in_stats_window": 57471,
+    "snapshot_md5": {
+      "categories": "f525d3ef340f2622ea3c15ec8092860e",
+      "comments": "def7b252014b6f16f0a5adc77cb93743",
+      "moderation_records": "41c07fb0b2e31a64d23b270be13ebb3d",
+      "posts": "aa0e431697a2fad6770657001c18eafc",
+      "profiles": "53661417280c6a1c414d92f2d5ed691b",
+      "reactions": "40b6149c849af34e1c08b50c77180dfe",
+      "users": "28cb50c5580de7a7b1185641dab2f956"
+    }
+  }
+}

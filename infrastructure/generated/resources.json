@@ -1,0 +1,226 @@
+{
+  "budget": {
+    "total_vcpu": 8.0,
+    "total_mem_mib": 16384,
+    "request_path_vcpu": 4.0,
+    "request_path_mem_mib": 8192,
+    "postgres_vcpu": 2.0,
+    "postgres_mem_mib": 4096,
+    "infra_reserve_vcpu": 2.0,
+    "infra_reserve_mem_mib": 4096
+  },
+  "architectures": {
+    "monolith": {
+      "components": {
+        "app": {
+          "cpu": 4.0,
+          "mem_mib": 8192,
+          "min": 1,
+          "max": 1,
+          "workers": 4,
+          "db_pool": 20,
+          "on_request_path": true,
+          "cpu_request": 4.0,
+          "cpu_limit": 4.0,
+          "mem_request_mib": 8192,
+          "mem_limit_mib": 8192
+        }
+      },
+      "max_request_path_cpu": 4.0,
+      "max_request_path_mem_mib": 8192,
+      "max_db_connections": 80,
+      "postgres": {
+        "cpu": 2.0,
+        "mem_mib": 4096
+      },
+      "hpa": null
+    },
+    "three_tier": {
+      "components": {
+        "frontend": {
+          "cpu": 0.5,
+          "mem_mib": 512,
+          "min": 1,
+          "max": 1,
+          "workers": 0,
+          "db_pool": 0,
+          "on_request_path": true,
+          "cpu_request": 0.5,
+          "cpu_limit": 0.5,
+          "mem_request_mib": 512,
+          "mem_limit_mib": 512
+        },
+        "backend": {
+          "cpu": 3.5,
+          "mem_mib": 7680,
+          "min": 1,
+          "max": 1,
+          "workers": 3,
+          "db_pool": 26,
+          "on_request_path": true,
+          "cpu_request": 3.5,
+          "cpu_limit": 3.5,
+          "mem_request_mib": 7680,
+          "mem_limit_mib": 7680
+        }
+      },
+      "max_request_path_cpu": 4.0,
+      "max_request_path_mem_mib": 8192,
+      "max_db_connections": 78,
+      "postgres": {
+        "cpu": 2.0,
+        "mem_mib": 4096
+      },
+      "hpa": null
+    },
+    "microservices": {
+      "components": {
+        "gateway": {
+          "cpu": 0.5,
+          "mem_mib": 1024,
+          "min": 1,
+          "max": 2,
+          "workers": 1,
+          "db_pool": 0,
+          "on_request_path": true,
+          "cpu_request": 0.5,
+          "cpu_limit": 0.5,
+          "mem_request_mib": 1024,
+          "mem_limit_mib": 1024
+        },
+        "auth": {
+          "cpu": 0.5,
+          "mem_mib": 1024,
+          "min": 1,
+          "max": 1,
+          "workers": 1,
+          "db_pool": 10,
+          "on_request_path": true,
+          "cpu_request": 0.5,
+          "cpu_limit": 0.5,
+          "mem_request_mib": 1024,
+          "mem_limit_mib": 1024
+        },
+        "content": {
+          "cpu": 0.5,
+          "mem_mib": 1024,
+          "min": 1,
+          "max": 2,
+          "workers": 1,
+          "db_pool": 25,
+          "on_request_path": true,
+          "cpu_request": 0.5,
+          "cpu_limit": 0.5,
+          "mem_request_mib": 1024,
+          "mem_limit_mib": 1024
+        },
+        "moderation": {
+          "cpu": 0.5,
+          "mem_mib": 1024,
+          "min": 1,
+          "max": 2,
+          "workers": 1,
+          "db_pool": 0,
+          "on_request_path": true,
+          "cpu_request": 0.5,
+          "cpu_limit": 0.5,
+          "mem_request_mib": 1024,
+          "mem_limit_mib": 1024
+        },
+        "analytics": {
+          "cpu": 0.5,
+          "mem_mib": 1024,
+          "min": 1,
+          "max": 1,
+          "workers": 1,
+          "db_pool": 20,
+          "on_request_path": true,
+          "cpu_request": 0.5,
+          "cpu_limit": 0.5,
+          "mem_request_mib": 1024,
+          "mem_limit_mib": 1024
+        }
+      },
+      "max_request_path_cpu": 4.0,
+      "max_request_path_mem_mib": 8192,
+      "max_db_connections": 80,
+      "postgres": {
+        "cpu": 2.0,
+        "mem_mib": 4096
+      },
+      "hpa": {
+        "target_cpu": 70,
+        "scale_up_stabilization_s": 0,
+        "scale_down_stabilization_s": 300
+      }
+    },
+    "serverless": {
+      "components": {
+        "of_gateway": {
+          "cpu": 0.5,
+          "mem_mib": 512,
+          "min": 1,
+          "max": 1,
+          "workers": 0,
+          "db_pool": 0,
+          "on_request_path": true,
+          "cpu_request": 0.5,
+          "cpu_limit": 0.5,
+          "mem_request_mib": 512,
+          "mem_limit_mib": 512
+        },
+        "fn_auth": {
+          "cpu": 0.5,
+          "mem_mib": 1024,
+          "min": 1,
+          "max": 1,
+          "workers": 1,
+          "db_pool": 10,
+          "on_request_path": true,
+          "cpu_request": 0.5,
+          "cpu_limit": 0.5,
+          "mem_request_mib": 1024,
+          "mem_limit_mib": 1024
+        },
+        "fn_content": {
+          "cpu": 0.5,
+          "mem_mib": 1024,
+          "min": 1,
+          "max": 5,
+          "workers": 1,
+          "db_pool": 12,
+          "on_request_path": true,
+          "cpu_request": 0.5,
+          "cpu_limit": 0.5,
+          "mem_request_mib": 1024,
+          "mem_limit_mib": 1024
+        },
+        "fn_stats": {
+          "cpu": 0.5,
+          "mem_mib": 1024,
+          "min": 1,
+          "max": 1,
+          "workers": 1,
+          "db_pool": 10,
+          "on_request_path": true,
+          "cpu_request": 0.5,
+          "cpu_limit": 0.5,
+          "mem_request_mib": 1024,
+          "mem_limit_mib": 1024
+        }
+      },
+      "max_request_path_cpu": 4.0,
+      "max_request_path_mem_mib": 7680,
+      "max_db_connections": 80,
+      "postgres": {
+        "cpu": 2.0,
+        "mem_mib": 4096
+      },
+      "hpa": {
+        "target_cpu": 70,
+        "scale_up_stabilization_s": 0,
+        "scale_down_stabilization_s": 300
+      }
+    }
+  }
+}

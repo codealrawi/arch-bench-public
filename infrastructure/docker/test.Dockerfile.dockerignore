@@ -1,0 +1,13 @@
+.git
+.env
+.env.*
+**/__pycache__
+**/*.pyc
+.mypy_cache
+.ruff_cache
+.pytest_cache
+.local
+backups
+experiments/raw
+experiments/results
+infrastructure/monitoring/k3s-token

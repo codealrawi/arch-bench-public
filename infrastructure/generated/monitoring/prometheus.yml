@@ -1,0 +1,68 @@
+# Сгенерировано infrastructure/render.py из experiments/configs/bench.yaml.
+# Не редактировать вручную: python -m infrastructure.render
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+scrape_configs:
+- job_name: cadvisor
+  static_configs:
+  - targets:
+    - 127.0.0.1:8081
+- job_name: node
+  static_configs:
+  - targets:
+    - 127.0.0.1:9100
+- job_name: postgres
+  static_configs:
+  - targets:
+    - 127.0.0.1:9187
+- job_name: app-compose
+  static_configs:
+  - targets:
+    - 127.0.0.1:8000
+    labels:
+      arch: monolith
+  - targets:
+    - 127.0.0.1:8001
+    labels:
+      arch: three_tier
+- job_name: kubelet-cadvisor
+  scheme: https
+  metrics_path: /metrics/cadvisor
+  static_configs:
+  - targets:
+    - 127.0.0.1:10250
+  authorization:
+    credentials_file: /etc/prometheus/k3s-token
+  tls_config:
+    insecure_skip_verify: true
+- job_name: kube-state-metrics
+  static_configs:
+  - targets:
+    - 127.0.0.1:30090
+- job_name: k8s-pods
+  kubernetes_sd_configs:
+  - role: pod
+    api_server: https://127.0.0.1:6443
+    authorization:
+      credentials_file: /etc/prometheus/k3s-token
+    tls_config:
+      insecure_skip_verify: true
+  relabel_configs:
+  - source_labels:
+    - __meta_kubernetes_pod_annotation_prometheus_io_scrape
+    action: keep
+    regex: 'true'
+  - source_labels:
+    - __address__
+    - __meta_kubernetes_pod_annotation_prometheus_io_port
+    action: replace
+    regex: ([^:]+)(?::\d+)?;(\d+)
+    replacement: $1:$2
+    target_label: __address__
+  - source_labels:
+    - __meta_kubernetes_namespace
+    target_label: namespace
+  - source_labels:
+    - __meta_kubernetes_pod_name
+    target_label: pod

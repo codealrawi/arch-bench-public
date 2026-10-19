@@ -1,0 +1,25 @@
+# Сгенерировано infrastructure/render.py из experiments/configs/bench.yaml.
+# Не редактировать вручную: python -m infrastructure.render
+functionNamespace: openfaas-fn
+generateBasicAuth: true
+openfaasPro: false
+exposeServices: true
+serviceType: NodePort
+httpProbe: true
+gateway:
+  replicas: 1
+  nodePort: 31112
+  upstreamTimeout: 30s
+  readTimeout: 35s
+  writeTimeout: 35s
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+queueWorker:
+  replicas: 1
+alertmanager:
+  create: false

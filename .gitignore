@@ -1,0 +1,31 @@
+# секреты (никогда не коммитить)
+.env
+.env.*
+!.env.example
+infrastructure/monitoring/k3s-token
+infrastructure/kubernetes/secrets/*.yaml
+!infrastructure/kubernetes/secrets/*.example.yaml
+*personal access token*
+*.pem
+*.key
+backups/
+
+# окружения и кэши
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.local/
+node_modules/
+
+# сгенерированное (пересоздаётся из experiments/configs/bench.yaml)
+infrastructure/build/
+
+# сырые данные (≈ 0,5–1 ГБ на прогон) и выход анализа — вне git;
+# целостность сырых данных — experiments/raw/MANIFEST.sha256
+experiments/raw/*
+!experiments/raw/.gitkeep
+experiments/results/*
+!experiments/results/.gitkeep

@@ -1,0 +1,154 @@
+# Сгенерировано infrastructure/render.py из experiments/configs/bench.yaml.
+# Не редактировать вручную: python -m infrastructure.render
+version: 1.0
+provider:
+  name: openfaas
+  gateway: ${OPENFAAS_URL}
+functions:
+  auth:
+    lang: arch-bench-asgi
+    handler: ./serverless/functions
+    image: docker.io/mustafaalrawi8/arch-bench-app:2.1.0
+    skip_build: true
+    environment:
+      ACCESS_TOKEN_TTL_S: '3600'
+      REFRESH_TOKEN_TTL_S: '604800'
+      PBKDF2_ITERATIONS: '1000'
+      REQUEST_TIMEOUT_S: '30.0'
+      RATE_LIMIT_AUTH_PER_MINUTE: '5000'
+      FEED_LIMIT: '20'
+      COMMENTS_PAGE_LIMIT: '50'
+      SEARCH_LIMIT: '20'
+      STATS_WINDOW_DAYS: '7'
+      UPSTREAM_TIMEOUT_S: '30.0'
+      LOG_LEVEL: INFO
+      LOG_REQUESTS: 'false'
+      PYTHONUNBUFFERED: '1'
+      SERVICE_NAME: serverless-auth
+      AUTH_MODE: jwt
+      APP_FACTORY: serverless.functions.handlers:create_auth
+      APP_PORT: '8080'
+      APP_WORKERS: '1'
+      GRACEFUL_SHUTDOWN_S: '25'
+      DB_POOL_SIZE: '10'
+      DB_COMMAND_TIMEOUT_S: '30.0'
+      HEALTH_PATH: /_/health
+      JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: postgresql://bench:${POSTGRES_PASSWORD}@postgres.arch-bench.svc.cluster.local:5432/bench
+    requests:
+      cpu: 500m
+      memory: 1024Mi
+    limits:
+      cpu: 500m
+      memory: 1024Mi
+    labels:
+      com.openfaas.scale.min: '1'
+      com.openfaas.scale.max: '1'
+      com.openfaas.scale.zero: 'false'
+      arch-bench/role: request-path
+      arch-bench/arch: serverless
+    annotations:
+      com.openfaas.health.http.path: /_/health
+      com.openfaas.ready.http.path: /_/ready
+      com.openfaas.health.http.initialDelay: 10s
+      prometheus.io/scrape: 'true'
+      prometheus.io/port: '8080'
+      prometheus.io/path: /metrics
+  content:
+    lang: arch-bench-asgi
+    handler: ./serverless/functions
+    image: docker.io/mustafaalrawi8/arch-bench-app:2.1.0
+    skip_build: true
+    environment:
+      ACCESS_TOKEN_TTL_S: '3600'
+      REFRESH_TOKEN_TTL_S: '604800'
+      PBKDF2_ITERATIONS: '1000'
+      REQUEST_TIMEOUT_S: '30.0'
+      RATE_LIMIT_AUTH_PER_MINUTE: '5000'
+      FEED_LIMIT: '20'
+      COMMENTS_PAGE_LIMIT: '50'
+      SEARCH_LIMIT: '20'
+      STATS_WINDOW_DAYS: '7'
+      UPSTREAM_TIMEOUT_S: '30.0'
+      LOG_LEVEL: INFO
+      LOG_REQUESTS: 'false'
+      PYTHONUNBUFFERED: '1'
+      SERVICE_NAME: serverless-content
+      AUTH_MODE: jwt
+      APP_FACTORY: serverless.functions.handlers:create_content
+      APP_PORT: '8080'
+      APP_WORKERS: '1'
+      GRACEFUL_SHUTDOWN_S: '25'
+      DB_POOL_SIZE: '12'
+      DB_COMMAND_TIMEOUT_S: '30.0'
+      HEALTH_PATH: /_/health
+      JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: postgresql://bench:${POSTGRES_PASSWORD}@postgres.arch-bench.svc.cluster.local:5432/bench
+    requests:
+      cpu: 500m
+      memory: 1024Mi
+    limits:
+      cpu: 500m
+      memory: 1024Mi
+    labels:
+      com.openfaas.scale.min: '1'
+      com.openfaas.scale.max: '5'
+      com.openfaas.scale.zero: 'false'
+      arch-bench/role: request-path
+      arch-bench/arch: serverless
+    annotations:
+      com.openfaas.health.http.path: /_/health
+      com.openfaas.ready.http.path: /_/ready
+      com.openfaas.health.http.initialDelay: 10s
+      prometheus.io/scrape: 'true'
+      prometheus.io/port: '8080'
+      prometheus.io/path: /metrics
+  stats:
+    lang: arch-bench-asgi
+    handler: ./serverless/functions
+    image: docker.io/mustafaalrawi8/arch-bench-app:2.1.0
+    skip_build: true
+    environment:
+      ACCESS_TOKEN_TTL_S: '3600'
+      REFRESH_TOKEN_TTL_S: '604800'
+      PBKDF2_ITERATIONS: '1000'
+      REQUEST_TIMEOUT_S: '30.0'
+      RATE_LIMIT_AUTH_PER_MINUTE: '5000'
+      FEED_LIMIT: '20'
+      COMMENTS_PAGE_LIMIT: '50'
+      SEARCH_LIMIT: '20'
+      STATS_WINDOW_DAYS: '7'
+      UPSTREAM_TIMEOUT_S: '30.0'
+      LOG_LEVEL: INFO
+      LOG_REQUESTS: 'false'
+      PYTHONUNBUFFERED: '1'
+      SERVICE_NAME: serverless-stats
+      AUTH_MODE: jwt
+      APP_FACTORY: serverless.functions.handlers:create_stats
+      APP_PORT: '8080'
+      APP_WORKERS: '1'
+      GRACEFUL_SHUTDOWN_S: '25'
+      DB_POOL_SIZE: '10'
+      DB_COMMAND_TIMEOUT_S: '30.0'
+      HEALTH_PATH: /_/health
+      JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: postgresql://bench:${POSTGRES_PASSWORD}@postgres.arch-bench.svc.cluster.local:5432/bench
+    requests:
+      cpu: 500m
+      memory: 1024Mi
+    limits:
+      cpu: 500m
+      memory: 1024Mi
+    labels:
+      com.openfaas.scale.min: '1'
+      com.openfaas.scale.max: '1'
+      com.openfaas.scale.zero: 'false'
+      arch-bench/role: request-path
+      arch-bench/arch: serverless
+    annotations:
+      com.openfaas.health.http.path: /_/health
+      com.openfaas.ready.http.path: /_/ready
+      com.openfaas.health.http.initialDelay: 10s
+      prometheus.io/scrape: 'true'
+      prometheus.io/port: '8080'
+      prometheus.io/path: /metrics

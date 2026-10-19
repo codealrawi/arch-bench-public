@@ -1,0 +1,91 @@
+# Сгенерировано infrastructure/render.py из experiments/configs/bench.yaml.
+# Не редактировать вручную: python -m infrastructure.render
+name: arch-bench-monitoring
+services:
+  prometheus:
+    image: prom/prometheus:v2.53.2
+    network_mode: host
+    command:
+    - --config.file=/etc/prometheus/prometheus.yml
+    - --storage.tsdb.retention.time=30d
+    - --web.listen-address=127.0.0.1:9090
+    volumes:
+    - ../monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    - ../../monitoring/k3s-token:/etc/prometheus/k3s-token:ro
+    - promdata:/prometheus
+    cpus: '0.5'
+    mem_limit: 1024m
+    restart: unless-stopped
+  grafana:
+    image: grafana/grafana:11.2.0
+    network_mode: host
+    environment:
+      GF_SERVER_HTTP_ADDR: 127.0.0.1
+      GF_SERVER_HTTP_PORT: '3000'
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?GRAFANA_ADMIN_PASSWORD
+        is required (.env)}
+      GF_USERS_ALLOW_SIGN_UP: 'false'
+      GF_ANALYTICS_REPORTING_ENABLED: 'false'
+    volumes:
+    - ../monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+    - ../monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    - grafanadata:/var/lib/grafana
+    cpus: '0.25'
+    mem_limit: 512m
+    restart: unless-stopped
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    privileged: true
+    devices:
+    - /dev/kmsg
+    command:
+    - --housekeeping_interval=5s
+    - --docker_only=false
+    - --store_container_labels=true
+    - --port=8081
+    network_mode: host
+    volumes:
+    - /:/rootfs:ro
+    - /var/run:/var/run:ro
+    - /sys:/sys:ro
+    - /var/lib/docker/:/var/lib/docker:ro
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - -q
+      - --spider
+      - http://127.0.0.1:8081/healthz
+      interval: 30s
+      timeout: 3s
+      retries: 3
+    cpus: '0.5'
+    mem_limit: 512m
+    restart: unless-stopped
+  node-exporter:
+    image: prom/node-exporter:v1.8.2
+    network_mode: host
+    pid: host
+    command:
+    - --path.rootfs=/host
+    - --web.listen-address=127.0.0.1:9100
+    volumes:
+    - /:/host:ro,rslave
+    cpus: '0.25'
+    mem_limit: 128m
+    restart: unless-stopped
+  postgres-exporter:
+    image: quay.io/prometheuscommunity/postgres-exporter:v0.15.0
+    network_mode: host
+    command:
+    - --collector.stat_statements
+    - --web.listen-address=127.0.0.1:9187
+    environment:
+      DATA_SOURCE_NAME: postgresql://bench:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD
+        is required}@127.0.0.1:${PG_EXPORT_PORT:-5432}/bench?sslmode=disable
+    cpus: '0.25'
+    mem_limit: 128m
+    restart: unless-stopped
+volumes:
+  promdata: {}
+  grafanadata: {}

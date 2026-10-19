@@ -1,0 +1,27 @@
+== raw/serverless/_invalid/run_05_20261007T125153Z/INVALID_REASON.md
+# Невалидный прогон (протокол §12.2)
+
+- пропуск мониторинга pods.csv: 65 с > 30 с
+- teardown: Command '['kubectl', 'delete', 'namespace', 'arch-bench', '--wait=true', '--ignore-not-found']' timed out after 900 seconds
+
+Сырые данные сохранены; прогон повторяется с тем же номером.
+== raw/serverless/_invalid/run_05_20261007T113706Z/INVALID_REASON.md
+# Невалидный прогон (протокол §12.2)
+
+- пропуск мониторинга pg_connections.csv: 53 с > 30 с
+
+Сырые данные сохранены; прогон повторяется с тем же номером.
+== raw/three_tier/_invalid/run_06_20261007T151326Z/INVALID_REASON.md
+# Невалидный прогон (протокол §12.2)
+
+- k6 завершился с кодом 1 (аварийно)
+- нет момента старта сценария в сырых данных
+- teardown: Command '['docker', 'compose', '-f', '/root/arch-bench/infrastructure/generated/compose/three-tier.yml', '--env-file', '/root/arch-bench/.env', 'down', '-v', '--remove-orphans']' timed out after 300 seconds
+
+Сырые данные сохранены; прогон повторяется с тем же номером.
+== raw/three_tier/_invalid/run_06_20261007T152042Z/INVALID_REASON.md
+# Невалидный прогон (протокол §12.2)
+
+- сбой стенда: TimeoutExpired: Command '['docker', 'compose', '-f', '/root/arch-bench/infrastructure/generated/compose/three-tier.yml', '--env-file', '/root/arch-bench/.env', 'down', '-v', '--remove-orphans']' timed out after 300 seconds
+
+Сырые данные сохранены; прогон повторяется с тем же номером.

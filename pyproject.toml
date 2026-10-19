@@ -1,0 +1,88 @@
+[project]
+name = "arch-bench"
+version = "2.0.0"
+description = "Медико-социальная платформа и экспериментальная система сравнения архитектур"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "asyncpg>=0.29",
+    "pyjwt>=2.9",
+    "pydantic>=2.8",
+    "httpx>=0.27",
+    "pyyaml>=6.0",
+    "email-validator>=2.2",
+    "prometheus-client>=0.20",
+    "alembic>=1.13",
+    "sqlalchemy>=2.0",
+    "psycopg[binary]>=3.2",
+]
+
+[project.optional-dependencies]
+analysis = [
+    "numpy>=2.0",
+    "pandas>=2.2",
+    "scipy>=1.14",
+    "matplotlib>=3.9",
+]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "ruff>=0.6",
+    "black>=24.8",
+    "mypy>=1.11",
+    "types-PyYAML",
+    "pgserver>=0.1.4",
+]
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["apps*", "serverless*", "database*", "infrastructure*", "experiments*"]
+
+[tool.setuptools.package-data]
+"apps.shared" = ["schema.sql"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
+markers = [
+    "pg: требует реальный PostgreSQL (pgserver или ARCH_BENCH_TEST_DSN)",
+    "docker: требует Docker",
+    "k6: требует установленный k6",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+# перенесён из medplatforma без изменения алгоритма (проверка эквивалентности — test_moderation)
+extend-exclude = ["apps/shared/moderation.py", "infrastructure/build", "docs/reports", "docs/submission_vek21"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "N", "SIM"]
+ignore = ["N818"]  # имена исключений вида RunAborted/AuthError — осознанно без суффикса Error
+
+[tool.ruff.lint.flake8-bugbear]
+# идиома FastAPI: зависимости объявляются значениями по умолчанию
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Header"]
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+extend-exclude = "apps/shared/moderation\\.py|infrastructure/build|docs/reports|docs/submission_vek21"
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+ignore_missing_imports = true
+exclude = ["tests/", "infrastructure/build/", "docs/reports/", "docs/submission_vek21/"]
+# перенесённый модуль модерации без аннотаций типов (алгоритм не меняется)
+untyped_calls_exclude = ["apps.shared.moderation"]
+
+[[tool.mypy.overrides]]
+module = "apps.shared.moderation"
+ignore_errors = true

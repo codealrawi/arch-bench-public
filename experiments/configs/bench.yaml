@@ -1,0 +1,192 @@
+# Единственный источник параметров эксперимента (протокол v2.0, docs/experimental-protocol.md).
+# Код не содержит научных констант: всё читается отсюда через experiments.config.load_bench_config().
+# Манифесты Docker/k8s/OpenFaaS генерируются отсюда: python -m infrastructure.render
+protocol_version: "2.1"
+
+budget:                      # P-30..P-32, docs/resource-allocation.md
+  total_vcpu: 8.0
+  total_mem_mib: 16384
+  request_path_vcpu: 4.0
+  request_path_mem_mib: 8192
+  postgres_vcpu: 2.0
+  postgres_mem_mib: 4096
+  infra_reserve_vcpu: 2.0
+  infra_reserve_mem_mib: 4096
+
+postgres:
+  image: "postgres:16"       # на сервере заменяется ссылкой по digest (RECORDED)
+  max_connections: 100
+  total_app_pool: 80         # P-35
+  settings:                  # один postgresql.conf для всех конфигураций (протокол §1)
+    shared_buffers: "1GB"            # 25 % от лимита памяти PG (4 GiB)
+    effective_cache_size: "3GB"
+    work_mem: "16MB"
+    maintenance_work_mem: "256MB"
+    synchronous_commit: "on"
+    max_wal_size: "2GB"
+    random_page_cost: "1.1"
+    listen_addresses: "'*'"
+    shared_preload_libraries: "'pg_stat_statements'"   # задержка запросов БД (мониторинг)
+    pg_stat_statements.track: "top"
+
+images:                      # один образ приложения для всех Python-компонентов
+  # app — ПУБЛИЧНЫЙ образ: OpenFaaS CE разворачивает функции только из публичных образов
+  # (проверено на Timeweb 2026-10-05). Реестр/имя задаёт автор; install.sh публикует образ.
+  app: "docker.io/mustafaalrawi8/arch-bench-app:2.1.0"
+  frontend: "arch-bench-frontend:2.1.0"
+  nginx: "nginx:1.27"        # на сервере — по digest (RECORDED)
+  prometheus: "prom/prometheus:v2.53.2"
+  grafana: "grafana/grafana:11.2.0"
+  cadvisor: "gcr.io/cadvisor/cadvisor:v0.49.1"
+  node_exporter: "prom/node-exporter:v1.8.2"
+  postgres_exporter: "quay.io/prometheuscommunity/postgres-exporter:v0.15.0"
+  kube_state_metrics: "registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.13.0"
+
+network:
+  app_port: 8000
+  function_port: 8080        # контракт OpenFaaS: контейнер слушает 8080
+  gateway_node_port: 30080   # microservices: вход API для k6
+  openfaas_node_port: 31112  # serverless: шлюз OpenFaaS (значение чарта по умолчанию)
+  frontend_port: 8080        # 3-tier: nginx (путь запроса)
+  monolith_port: 8000
+  ui_microservices_node_port: 30081   # frontend C (вне пути запроса)
+  ui_serverless_node_port: 30082      # frontend D (вне пути запроса)
+  upstream_timeout_s: 30     # межсервисные вызовы: равен таймауту k6 (P-27)
+
+app:                         # переменные окружения процессов (apps/shared/settings.py)
+  access_token_ttl_s: 3600
+  refresh_token_ttl_s: 604800
+  request_timeout_s: 30      # = таймаут k6 (P-27)
+  db_command_timeout_s: 30
+  # вход 1000 пользователей в setup() k6 с одного IP генератора; на измеряемые операции
+  # ограничение не распространяется (docs/api.md). Для эксплуатации задаётся в .env.
+  rate_limit_auth_per_minute: 5000
+  log_level: INFO
+  log_requests: false        # журнал каждого запроса выключен в эксперименте (влияет на RT)
+  graceful_shutdown_s: 25
+
+data:                        # P-14..P-19; объёмы — решение автора M-3 (2026-10-05)
+  seed: 20261004
+  users: 10000               # = профили (по одному на пользователя)
+  moderators: 10             # первые id после admins — роль moderator
+  admins: 1                  # id 1 — admin
+  posts: 200000
+  comments: 600000
+  reactions: 1500000         # различные пары (пост, пользователь)
+  doctor_share: 0.3
+  user_age_days: 365         # регистрация пользователей — за год до сброса
+  created_at_window_days: 30 # посты — за 30 дней до сброса
+  suspicious_share: 0.05
+  body_words_min: 20
+  body_words_max: 80
+  comment_words_min: 5
+  comment_words_max: 40
+  reaction_kinds: {like: 0.6, support: 0.25, useful: 0.15}
+  stats_window_days: 7       # окно GET /stats (ТЗ)
+  feed_limit: 20             # лента: последние 20 записей (ТЗ)
+  comments_page_limit: 50
+  search_limit: 20
+
+auth:                        # протокол §5
+  algorithm: HS256
+  token_ttl_s: 3600
+  pbkdf2_iterations: 1000    # логин только в setup() k6, вне измерений
+  password_template: "bench-{user_id}"   # пароли seed-пользователей (тестовые учётные записи стенда)
+
+load:                        # P-20..P-29
+  executor: ramping-vus
+  steps_server: [10, 50, 100, 200, 500, 1000, 2000, 5000]
+  steps_local: [10, 100]
+  # решение автора M-1 (2026-10-05): чтение 60 / запись 30 / статистика 10 (READ 70 / WRITE 30)
+  mix:
+    feed: 0.30
+    get_post: 0.15
+    get_profile: 0.05
+    search: 0.10
+    create_post: 0.12
+    create_comment: 0.10
+    reaction: 0.06
+    update_profile: 0.02
+    stats: 0.10
+  search_terms: [кардиология, диабет, терапия, реабилитация, давление, вакцина, анализ крови,
+                 профилактика, антибиотик, температура]
+  think_time_s: 1.0
+  ramp_s: 30
+  warmup_s: 60
+  measure_s: 300
+  timeout_s: 30
+  k6_seed_base: 20261004
+  login_pool_size: 1000      # число seed-пользователей, для которых выпускаются JWT в setup()
+  post_pool_pages: 100       # страниц ленты в setup(): пул id одобренных постов (20 × 100)
+
+coldstart:                   # мини-эксперимент «холодный старт» (протокол §11, P-34)
+  repeats: 30
+  pause_s: 60
+
+runs:                        # P-38..P-40
+  count: 10
+  interleave: true
+
+metrics:                     # P-42..P-49
+  percentile_method: linear
+  failed_window_s: 60
+  failed_error_share: 0.50
+  monitoring_step_s: 5
+  # M-4 (2026-10-05): ошибка = 5xx ИЛИ таймаут ИЛИ нет ответа (сброс/отказ соединения)
+  count_transport_errors: true
+
+sla:                         # P-48: значение обязательно; задаётся здесь ИЛИ env SLA_MS
+  sla_ms: 500
+  sla_metric: p95
+  source: "AUTHOR-defined experimental threshold (2026-10-04)"
+
+statistics:                  # P-50..P-58
+  bootstrap_b: 10000
+  bootstrap_seed: 20261004
+  ci_level: 0.95
+  alpha: 0.05
+  compare_steps: [500, 1000, 2000]
+  littles_law_tolerance: 0.10
+
+invalid_run:                 # протокол §12
+  generator_cpu_max: 0.85
+  generator_cpu_max_duration_s: 10
+  max_monitoring_gap_s: 30
+  max_4xx_share: 0.01
+
+mcda:                        # docs/evaluation-methodology.md
+  reference_step: 1000
+  error_threshold: 0.01
+  fault_tolerance_step: 5000
+
+# docs/resource-allocation.md v2.0. requests = limits; Σ(max·cpu) = 4.0 у каждой архитектуры;
+# Σ(max·workers·db_pool) ≤ 80. «route_prefixes» — пути доменов для k6 (у serverless — шлюз OpenFaaS).
+architectures:
+  monolith:
+    entry: {port_key: monolith_port, route_prefixes: {auth: "", content: "", stats: ""}}
+    components:
+      app: {cpu: 4.0, mem_mib: 8192, min: 1, max: 1, workers: 4, db_pool: 20, on_request_path: true}
+  three_tier:
+    entry: {port_key: frontend_port, route_prefixes: {auth: "", content: "", stats: ""}}
+    components:
+      frontend: {cpu: 0.5, mem_mib: 512, min: 1, max: 1, workers: 0, db_pool: 0, on_request_path: true}
+      backend: {cpu: 3.5, mem_mib: 7680, min: 1, max: 1, workers: 3, db_pool: 26, on_request_path: true}
+  microservices:
+    entry: {port_key: gateway_node_port, route_prefixes: {auth: "", content: "", stats: ""}}
+    hpa: {target_cpu: 70, scale_up_stabilization_s: 0, scale_down_stabilization_s: 300}
+    components:
+      gateway: {cpu: 0.5, mem_mib: 1024, min: 1, max: 2, workers: 1, db_pool: 0, on_request_path: true}
+      auth: {cpu: 0.5, mem_mib: 1024, min: 1, max: 1, workers: 1, db_pool: 10, on_request_path: true}
+      content: {cpu: 0.5, mem_mib: 1024, min: 1, max: 2, workers: 1, db_pool: 25, on_request_path: true}
+      moderation: {cpu: 0.5, mem_mib: 1024, min: 1, max: 2, workers: 1, db_pool: 0, on_request_path: true}
+      analytics: {cpu: 0.5, mem_mib: 1024, min: 1, max: 1, workers: 1, db_pool: 20, on_request_path: true}
+  serverless:
+    entry: {port_key: openfaas_node_port,
+            route_prefixes: {auth: /function/auth, content: /function/content, stats: /function/stats}}
+    hpa: {target_cpu: 70, scale_up_stabilization_s: 0, scale_down_stabilization_s: 300}
+    scale_to_zero: false
+    components:
+      of_gateway: {cpu: 0.5, mem_mib: 512, min: 1, max: 1, workers: 0, db_pool: 0, on_request_path: true}
+      fn_auth: {cpu: 0.5, mem_mib: 1024, min: 1, max: 1, workers: 1, db_pool: 10, on_request_path: true}
+      fn_content: {cpu: 0.5, mem_mib: 1024, min: 1, max: 5, workers: 1, db_pool: 12, on_request_path: true}
+      fn_stats: {cpu: 0.5, mem_mib: 1024, min: 1, max: 1, workers: 1, db_pool: 10, on_request_path: true}

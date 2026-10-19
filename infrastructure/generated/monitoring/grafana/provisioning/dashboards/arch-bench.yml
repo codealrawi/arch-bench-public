@@ -1,0 +1,9 @@
+# Сгенерировано infrastructure/render.py из experiments/configs/bench.yaml.
+# Не редактировать вручную: python -m infrastructure.render
+apiVersion: 1
+providers:
+- name: arch-bench
+  folder: arch-bench
+  type: file
+  options:
+    path: /var/lib/grafana/dashboards

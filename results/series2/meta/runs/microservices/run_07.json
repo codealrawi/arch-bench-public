@@ -1,0 +1,731 @@
+{
+  "architecture": "microservices",
+  "run_index": 7,
+  "environment": "server",
+  "protocol_version": "2.1",
+  "config_sha256": "963109ae713552e6c366ac67a2c19bdf82028a4a669ad8c171128a43b4fb32d0",
+  "config": {
+    "protocol_version": "2.1",
+    "budget": {
+      "total_vcpu": 8.0,
+      "total_mem_mib": 16384,
+      "request_path_vcpu": 4.0,
+      "request_path_mem_mib": 8192,
+      "postgres_vcpu": 2.0,
+      "postgres_mem_mib": 4096,
+      "infra_reserve_vcpu": 2.0,
+      "infra_reserve_mem_mib": 4096
+    },
+    "postgres": {
+      "image": "postgres:16",
+      "max_connections": 100,
+      "total_app_pool": 80,
+      "settings": {
+        "shared_buffers": "1GB",
+        "effective_cache_size": "3GB",
+        "work_mem": "16MB",
+        "maintenance_work_mem": "256MB",
+        "synchronous_commit": "on",
+        "max_wal_size": "2GB",
+        "random_page_cost": "1.1",
+        "listen_addresses": "'*'",
+        "shared_preload_libraries": "'pg_stat_statements'",
+        "pg_stat_statements.track": "top"
+      }
+    },
+    "images": {
+      "app": "docker.io/mustafaalrawi8/arch-bench-app:2.1.0",
+      "frontend": "arch-bench-frontend:2.1.0",
+      "nginx": "nginx:1.27",
+      "prometheus": "prom/prometheus:v2.53.2",
+      "grafana": "grafana/grafana:11.2.0",
+      "cadvisor": "gcr.io/cadvisor/cadvisor:v0.49.1",
+      "node_exporter": "prom/node-exporter:v1.8.2",
+      "postgres_exporter": "quay.io/prometheuscommunity/postgres-exporter:v0.15.0",
+      "kube_state_metrics": "registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.13.0"
+    },
+    "network": {
+      "app_port": 8000,
+      "function_port": 8080,
+      "gateway_node_port": 30080,
+      "openfaas_node_port": 31112,
+      "frontend_port": 8080,
+      "monolith_port": 8000,
+      "ui_microservices_node_port": 30081,
+      "ui_serverless_node_port": 30082,
+      "upstream_timeout_s": 30.0
+    },
+    "app": {
+      "access_token_ttl_s": 3600,
+      "refresh_token_ttl_s": 604800,
+      "request_timeout_s": 30.0,
+      "db_command_timeout_s": 30.0,
+      "rate_limit_auth_per_minute": 5000,
+      "log_level": "INFO",
+      "log_requests": false,
+      "graceful_shutdown_s": 25
+    },
+    "data": {
+      "seed": 20261004,
+      "users": 10000,
+      "moderators": 10,
+      "admins": 1,
+      "posts": 200000,
+      "comments": 600000,
+      "reactions": 1500000,
+      "doctor_share": 0.3,
+      "user_age_days": 365,
+      "created_at_window_days": 30,
+      "suspicious_share": 0.05,
+      "body_words_min": 20,
+      "body_words_max": 80,
+      "comment_words_min": 5,
+      "comment_words_max": 40,
+      "reaction_kinds": {
+        "like": 0.6,
+        "support": 0.25,
+        "useful": 0.15
+      },
+      "stats_window_days": 7,
+      "feed_limit": 20,
+      "comments_page_limit": 50,
+      "search_limit": 20
+    },
+    "auth": {
+      "algorithm": "HS256",
+      "token_ttl_s": 3600,
+      "pbkdf2_iterations": 1000,
+      "password_template": "bench-{user_id}"
+    },
+    "load": {
+      "executor": "ramping-vus",
+      "steps_server": [
+        10,
+        50,
+        100,
+        200,
+        500,
+        1000,
+        2000,
+        5000
+      ],
+      "steps_local": [
+        10,
+        100
+      ],
+      "mix": {
+        "feed": 0.3,
+        "get_post": 0.15,
+        "get_profile": 0.05,
+        "search": 0.1,
+        "create_post": 0.12,
+        "create_comment": 0.1,
+        "reaction": 0.06,
+        "update_profile": 0.02,
+        "stats": 0.1
+      },
+      "search_terms": [
+        "кардиология",
+        "диабет",
+        "терапия",
+        "реабилитация",
+        "давление",
+        "вакцина",
+        "анализ крови",
+        "профилактика",
+        "антибиотик",
+        "температура"
+      ],
+      "think_time_s": 1.0,
+      "ramp_s": 30,
+      "warmup_s": 60,
+      "measure_s": 300,
+      "timeout_s": 30,
+      "k6_seed_base": 20261004,
+      "login_pool_size": 1000,
+      "post_pool_pages": 100
+    },
+    "coldstart": {
+      "repeats": 30,
+      "pause_s": 60.0
+    },
+    "runs": {
+      "count": 10,
+      "interleave": true
+    },
+    "metrics": {
+      "percentile_method": "linear",
+      "failed_window_s": 60,
+      "failed_error_share": 0.5,
+      "monitoring_step_s": 5,
+      "count_transport_errors": true
+    },
+    "sla": {
+      "sla_ms": 500.0,
+      "sla_metric": "p95",
+      "source": "AUTHOR-defined experimental threshold (2026-10-04)"
+    },
+    "statistics": {
+      "bootstrap_b": 10000,
+      "bootstrap_seed": 20261004,
+      "ci_level": 0.95,
+      "alpha": 0.05,
+      "compare_steps": [
+        500,
+        1000,
+        2000
+      ],
+      "littles_law_tolerance": 0.1
+    },
+    "invalid_run": {
+      "generator_cpu_max": 0.85,
+      "generator_cpu_max_duration_s": 10,
+      "max_monitoring_gap_s": 30,
+      "max_4xx_share": 0.01
+    },
+    "mcda": {
+      "reference_step": 1000,
+      "error_threshold": 0.01,
+      "fault_tolerance_step": 5000
+    },
+    "architectures": {
+      "monolith": {
+        "entry": {
+          "port_key": "monolith_port",
+          "route_prefixes": {
+            "auth": "",
+            "content": "",
+            "stats": ""
+          }
+        },
+        "components": {
+          "app": {
+            "cpu": 4.0,
+            "mem_mib": 8192,
+            "min": 1,
+            "max": 1,
+            "workers": 4,
+            "db_pool": 20,
+            "on_request_path": true
+          }
+        },
+        "hpa": null,
+        "scale_to_zero": null
+      },
+      "three_tier": {
+        "entry": {
+          "port_key": "frontend_port",
+          "route_prefixes": {
+            "auth": "",
+            "content": "",
+            "stats": ""
+          }
+        },
+        "components": {
+          "frontend": {
+            "cpu": 0.5,
+            "mem_mib": 512,
+            "min": 1,
+            "max": 1,
+            "workers": 0,
+            "db_pool": 0,
+            "on_request_path": true
+          },
+          "backend": {
+            "cpu": 3.5,
+            "mem_mib": 7680,
+            "min": 1,
+            "max": 1,
+            "workers": 3,
+            "db_pool": 26,
+            "on_request_path": true
+          }
+        },
+        "hpa": null,
+        "scale_to_zero": null
+      },
+      "microservices": {
+        "entry": {
+          "port_key": "gateway_node_port",
+          "route_prefixes": {
+            "auth": "",
+            "content": "",
+            "stats": ""
+          }
+        },
+        "components": {
+          "gateway": {
+            "cpu": 0.5,
+            "mem_mib": 1024,
+            "min": 1,
+            "max": 2,
+            "workers": 1,
+            "db_pool": 0,
+            "on_request_path": true
+          },
+          "auth": {
+            "cpu": 0.5,
+            "mem_mib": 1024,
+            "min": 1,
+            "max": 1,
+            "workers": 1,
+            "db_pool": 10,
+            "on_request_path": true
+          },
+          "content": {
+            "cpu": 0.5,
+            "mem_mib": 1024,
+            "min": 1,
+            "max": 2,
+            "workers": 1,
+            "db_pool": 25,
+            "on_request_path": true
+          },
+          "moderation": {
+            "cpu": 0.5,
+            "mem_mib": 1024,
+            "min": 1,
+            "max": 2,
+            "workers": 1,
+            "db_pool": 0,
+            "on_request_path": true
+          },
+          "analytics": {
+            "cpu": 0.5,
+            "mem_mib": 1024,
+            "min": 1,
+            "max": 1,
+            "workers": 1,
+            "db_pool": 20,
+            "on_request_path": true
+          }
+        },
+        "hpa": {
+          "target_cpu": 70,
+          "scale_up_stabilization_s": 0,
+          "scale_down_stabilization_s": 300
+        },
+        "scale_to_zero": null
+      },
+      "serverless": {
+        "entry": {
+          "port_key": "openfaas_node_port",
+          "route_prefixes": {
+            "auth": "/function/auth",
+            "content": "/function/content",
+            "stats": "/function/stats"
+          }
+        },
+        "components": {
+          "of_gateway": {
+            "cpu": 0.5,
+            "mem_mib": 512,
+            "min": 1,
+            "max": 1,
+            "workers": 0,
+            "db_pool": 0,
+            "on_request_path": true
+          },
+          "fn_auth": {
+            "cpu": 0.5,
+            "mem_mib": 1024,
+            "min": 1,
+            "max": 1,
+            "workers": 1,
+            "db_pool": 10,
+            "on_request_path": true
+          },
+          "fn_content": {
+            "cpu": 0.5,
+            "mem_mib": 1024,
+            "min": 1,
+            "max": 5,
+            "workers": 1,
+            "db_pool": 12,
+            "on_request_path": true
+          },
+          "fn_stats": {
+            "cpu": 0.5,
+            "mem_mib": 1024,
+            "min": 1,
+            "max": 1,
+            "workers": 1,
+            "db_pool": 10,
+            "on_request_path": true
+          }
+        },
+        "hpa": {
+          "target_cpu": 70,
+          "scale_up_stabilization_s": 0,
+          "scale_down_stabilization_s": 300
+        },
+        "scale_to_zero": false
+      }
+    }
+  },
+  "sla_ms": 500.0,
+  "steps": [
+    10,
+    50,
+    100,
+    200,
+    500,
+    1000,
+    2000,
+    5000
+  ],
+  "started_at_utc": "2026-10-07T21:07:13.672250+00:00",
+  "host": {
+    "collected_at_utc": "2026-10-06T09:17:51.923326+00:00",
+    "hostname": "msk-1-vm-e0rq",
+    "cpu": {
+      "logical_cpus": 8,
+      "machine": "x86_64",
+      "physical_cores": 8,
+      "model": "AMD EPYC-Rome Processor"
+    },
+    "memory_total_bytes": 16768274432,
+    "os": {
+      "system": "Linux",
+      "release": "6.8.0-146-generic",
+      "version": "#146-Ubuntu SMP PREEMPT_DYNAMIC Thu Sep  3 16:12:30 UTC 2026",
+      "platform": "Linux-6.8.0-146-generic-x86_64-with-glibc2.39",
+      "distribution": "Ubuntu 24.04.5 LTS"
+    },
+    "python": {
+      "version": "3.12.3",
+      "implementation": "CPython",
+      "executable": "/root/arch-bench/.venv/bin/python"
+    },
+    "tools": {
+      "k6": null,
+      "docker": "29.8.2",
+      "docker_compose": "5.6.0",
+      "kubectl": "{\n  \"clientVersion\": {\n    \"major\": \"1\",\n    \"minor\": \"28\",\n    \"gitVersion\": \"v1.28.15+k3s1\",\n    \"gitCommit\": \"869dd4d62626f5ba4afe3a923d77b2047c565a43\",\n    \"gitTreeState\": \"clean\",\n    \"buildDate\": \"2024-10-26T01:19:07Z\",\n    \"goVersion\": \"go1.22.8\",\n    \"compiler\": \"gc\",\n    \"platform\": \"linux/amd64\"\n  },\n  \"kustomizeVersion\": \"v5.0.4-0.20230601165947-6ce0bf390ce3\"\n}",
+      "k3s": "k3s version v1.28.15+k3s1 (869dd4d6)\ngo version go1.22.8",
+      "faas_cli": "0.18.14",
+      "openfaas_helm": "[{\"name\":\"openfaas\",\"namespace\":\"openfaas\",\"revision\":\"5\",\"updated\":\"2026-10-05 21:26:21.127728796 +0000 UTC\",\"status\":\"deployed\",\"chart\":\"openfaas-15.0.13\",\"app_version\":\"\"}]",
+      "git": "git version 2.43.0"
+    },
+    "network_interfaces": [
+      {
+        "name": "lo",
+        "mtu": 65536,
+        "addresses": [
+          "127.0.0.1",
+          "::1"
+        ]
+      },
+      {
+        "name": "eth0",
+        "mtu": 1500,
+        "addresses": [
+          "SUT_PUBLIC_IP",
+          "fe80::5c4a:70ff:feb7:35"
+        ]
+      },
+      {
+        "name": "eth1",
+        "mtu": 1500,
+        "addresses": [
+          "192.168.0.4",
+          "fe80::5652:ff:fea0:d8ea"
+        ]
+      },
+      {
+        "name": "docker0",
+        "mtu": 1500,
+        "addresses": [
+          "172.17.0.1",
+          "fe80::2cfc:ddff:fe1d:36c5"
+        ]
+      },
+      {
+        "name": "flannel.1",
+        "mtu": 1450,
+        "addresses": [
+          "10.42.0.0",
+          "fe80::3087:afff:fe2f:c925"
+        ]
+      },
+      {
+        "name": "cni0",
+        "mtu": 1450,
+        "addresses": [
+          "10.42.0.1",
+          "fe80::c43:45ff:fe00:8ea4"
+        ]
+      },
+      {
+        "name": "veth480e5d94",
+        "mtu": 1450,
+        "addresses": [
+          "fe80::ac87:e7ff:feca:b12b"
+        ]
+      },
+      {
+        "name": "veth8bc10955",
+        "mtu": 1450,
+        "addresses": [
+          "fe80::3c9e:f0ff:fea1:9eb6"
+        ]
+      },
+      {
+        "name": "veth2e558576",
+        "mtu": 1450,
+        "addresses": [
+          "fe80::830:6cff:fef4:69f9"
+        ]
+      },
+      {
+        "name": "veth1dda0666",
+        "mtu": 1450,
+        "addresses": [
+          "fe80::f882:3ff:fe73:c75e"
+        ]
+      },
+      {
+        "name": "vethfc5b3a08",
+        "mtu": 1450,
+        "addresses": [
+          "fe80::30d6:20ff:fe74:252f"
+        ]
+      },
+      {
+        "name": "vethf1fedff3",
+        "mtu": 1450,
+        "addresses": [
+          "fe80::ace2:26ff:fe64:75d4"
+        ]
+      },
+      {
+        "name": "vetha2fcf87c",
+        "mtu": 1450,
+        "addresses": [
+          "fe80::1463:41ff:fe63:7bfa"
+        ]
+      },
+      {
+        "name": "vethce5641ed",
+        "mtu": 1450,
+        "addresses": [
+          "fe80::4c0e:b2ff:feb2:5bdc"
+        ]
+      },
+      {
+        "name": "vethc6ffa216",
+        "mtu": 1450,
+        "addresses": [
+          "fe80::2051:efff:fe3e:2959"
+        ]
+      }
+    ],
+    "git": {
+      "commit": "77072238decbd54748b66420410fe33fdeb00e6b",
+      "dirty": false
+    },
+    "app_version": "2.0.0",
+    "unavailable": {
+      "k6": "k6 не найден в PATH"
+    }
+  },
+  "generator": {
+    "collected_at_utc": "2026-10-07T21:07:14.640657+00:00",
+    "hostname": "msk-1-vm-5ws4",
+    "cpu": {
+      "logical_cpus": 4,
+      "machine": "x86_64",
+      "physical_cores": 4,
+      "model": "AMD EPYC-Rome Processor"
+    },
+    "memory_total_bytes": 8325505024,
+    "os": {
+      "system": "Linux",
+      "release": "6.8.0-146-generic",
+      "version": "#146-Ubuntu SMP PREEMPT_DYNAMIC Thu Sep  3 16:12:30 UTC 2026",
+      "platform": "Linux-6.8.0-146-generic-x86_64-with-glibc2.39",
+      "distribution": "Ubuntu 24.04.5 LTS"
+    },
+    "python": {
+      "version": "3.12.3",
+      "implementation": "CPython",
+      "executable": "/usr/bin/python3"
+    },
+    "tools": {
+      "k6": "k6 v2.3.0 (commit/e088784614, go1.26.8, linux/amd64)",
+      "docker": null,
+      "docker_compose": null,
+      "kubectl": null,
+      "k3s": null,
+      "faas_cli": null,
+      "openfaas_helm": null,
+      "git": "git version 2.43.0"
+    },
+    "network_interfaces": [
+      {
+        "name": "lo",
+        "mtu": 65536,
+        "addresses": [
+          "127.0.0.1",
+          "::1"
+        ]
+      },
+      {
+        "name": "eth0",
+        "mtu": 1500,
+        "addresses": [
+          "GENERATOR_PUBLIC_IP",
+          "fe80::34ab:9aff:fe56:5b14"
+        ]
+      },
+      {
+        "name": "eth1",
+        "mtu": 1500,
+        "addresses": [
+          "192.168.0.5",
+          "fe80::5652:ff:fe0b:76d1"
+        ]
+      }
+    ],
+    "git": {
+      "commit": null,
+      "dirty": null,
+      "unavailable": "git: код 128: fatal: not a git repository (or any of the parent directories): .git"
+    },
+    "app_version": null,
+    "unavailable": {
+      "docker": "docker не найден в PATH",
+      "docker_compose": "docker не найден в PATH",
+      "kubectl": "kubectl не найден в PATH",
+      "k3s": "k3s не найден в PATH",
+      "faas_cli": "faas-cli не найден в PATH",
+      "openfaas_helm": "helm не найден в PATH"
+    },
+    "rtt": {
+      "host": "SUT_PUBLIC_IP",
+      "port": 8000,
+      "samples": 20,
+      "errors": 20,
+      "method": "tcp_connect",
+      "median_ms": null
+    }
+  },
+  "resources": {
+    "components": {
+      "gateway": {
+        "cpu": 0.5,
+        "mem_mib": 1024,
+        "min": 1,
+        "max": 2,
+        "workers": 1,
+        "db_pool": 0,
+        "on_request_path": true,
+        "cpu_request": 0.5,
+        "cpu_limit": 0.5,
+        "mem_request_mib": 1024,
+        "mem_limit_mib": 1024
+      },
+      "auth": {
+        "cpu": 0.5,
+        "mem_mib": 1024,
+        "min": 1,
+        "max": 1,
+        "workers": 1,
+        "db_pool": 10,
+        "on_request_path": true,
+        "cpu_request": 0.5,
+        "cpu_limit": 0.5,
+        "mem_request_mib": 1024,
+        "mem_limit_mib": 1024
+      },
+      "content": {
+        "cpu": 0.5,
+        "mem_mib": 1024,
+        "min": 1,
+        "max": 2,
+        "workers": 1,
+        "db_pool": 25,
+        "on_request_path": true,
+        "cpu_request": 0.5,
+        "cpu_limit": 0.5,
+        "mem_request_mib": 1024,
+        "mem_limit_mib": 1024
+      },
+      "moderation": {
+        "cpu": 0.5,
+        "mem_mib": 1024,
+        "min": 1,
+        "max": 2,
+        "workers": 1,
+        "db_pool": 0,
+        "on_request_path": true,
+        "cpu_request": 0.5,
+        "cpu_limit": 0.5,
+        "mem_request_mib": 1024,
+        "mem_limit_mib": 1024
+      },
+      "analytics": {
+        "cpu": 0.5,
+        "mem_mib": 1024,
+        "min": 1,
+        "max": 1,
+        "workers": 1,
+        "db_pool": 20,
+        "on_request_path": true,
+        "cpu_request": 0.5,
+        "cpu_limit": 0.5,
+        "mem_request_mib": 1024,
+        "mem_limit_mib": 1024
+      }
+    },
+    "max_request_path_cpu": 4.0,
+    "max_request_path_mem_mib": 8192,
+    "max_db_connections": 80,
+    "postgres": {
+      "cpu": 2.0,
+      "mem_mib": 4096
+    },
+    "hpa": {
+      "target_cpu": 70,
+      "scale_up_stabilization_s": 0,
+      "scale_down_stabilization_s": 300
+    }
+  },
+  "db_seed": {
+    "generate_s": 130.36,
+    "write_s": 24.74,
+    "postgres_server_version": "16.15 (Debian 16.15-1.pgdg13+2)",
+    "migration": "0004",
+    "state": {
+      "counts": {
+        "audit_logs": 0,
+        "refresh_tokens": 0,
+        "moderation_records": 200000,
+        "reactions": 1500000,
+        "comments": 600000,
+        "posts": 200000,
+        "profiles": 10000,
+        "users": 10000,
+        "medical_categories": 20
+      },
+      "posts_by_status": {
+        "approved": 189891,
+        "blocked": 1199,
+        "suspicious": 8910
+      },
+      "posts_in_stats_window": 46452,
+      "snapshot_md5": {
+        "categories": "f525d3ef340f2622ea3c15ec8092860e",
+        "comments": "def7b252014b6f16f0a5adc77cb93743",
+        "moderation_records": "41c07fb0b2e31a64d23b270be13ebb3d",
+        "posts": "aa0e431697a2fad6770657001c18eafc",
+        "profiles": "53661417280c6a1c414d92f2d5ed691b",
+        "reactions": "40b6149c849af34e1c08b50c77180dfe",
+        "users": "28cb50c5580de7a7b1185641dab2f956"
+      }
+    }
+  },
+  "finished_at_utc": "2026-10-07T22:30:24.643070+00:00",
+  "invalid_reasons": [],
+  "valid": true
+}

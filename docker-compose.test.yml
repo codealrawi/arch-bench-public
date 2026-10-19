@@ -1,0 +1,29 @@
+# Сгенерировано infrastructure/render.py из experiments/configs/bench.yaml.
+# Не редактировать вручную: python -m infrastructure.render
+name: arch-bench-test
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_USER: postgres
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - pg_isready -U postgres
+      interval: 2s
+      retries: 30
+  tests:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/test.Dockerfile
+    environment:
+      ARCH_BENCH_TEST_DSN: postgresql://postgres@postgres:5432/postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command:
+    - python
+    - -m
+    - pytest
+    - -q
